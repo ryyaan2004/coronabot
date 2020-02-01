@@ -33,12 +33,12 @@ class PartialFormatter(string.Formatter):
 def pretty_printed_string(json_list):
     fmt = PartialFormatter()
     r = "```"
-    r += fmt.format("|{:>20}|{:>10}|{:>10}|{:>10}|\n", "Country", "Confirmed", "Deaths", "Recovered")
+    r += fmt.format("|{:>20}|{:>10}|{:>10}|{:>10}|\n", "Country", "Confirmed", "Deaths", "ImNotDead")
     r += fmt.format("|{:>20}|{:>10}|{:>10}|{:>10}|\n", "", "", "", "")
     for item in json_list:
         thing = item['attributes']
         r += fmt.format("|{:>20}|{:>10}|{:>10}|{:>10}|\n", thing['Country_Region'], thing['Confirmed'],
-                        thing['Deaths'], thing['Recovered'])
+                        thing['Deaths'], thing['ImNotDead'])
     r += "```"
     return r
 
