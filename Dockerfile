@@ -1,7 +1,9 @@
-FROM python:3.6
+FROM python:3.6-alpine
+RUN apk add gcc musl-dev && pip install pipenv
 
-RUN pip install requests slackclient
+COPY Pipfile /opt
+RUN cd /opt && pipenv lock --requirements > requirements.txt && pip install -r /opt/requirements.txt
 
-ADD src/ /
+ADD src/ /opt/coronabot
 
-CMD ["python", "./coronabot.py"]
+CMD ["python", "/opt/coronabot/coronabot.py"]
