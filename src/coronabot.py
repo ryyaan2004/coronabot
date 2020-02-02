@@ -38,7 +38,7 @@ def pretty_printed_string(json_list):
     for item in json_list:
         thing = item['attributes']
         r += fmt.format("|{:>20}|{:>10}|{:>10}|{:>10}|\n", thing['Country_Region'], thing['Confirmed'],
-                        thing['Deaths'], thing['ImNotDead'])
+                        thing['Deaths'], thing['Recovered'])
     r += "```"
     return r
 
