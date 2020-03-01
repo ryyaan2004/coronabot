@@ -2,6 +2,7 @@ import requests
 import string
 import slack
 import os
+from flask import Flask
 
 
 class PartialFormatter(string.Formatter):
@@ -43,18 +44,29 @@ def pretty_printed_string(json_list):
     return r
 
 
-token = os.environ['SLACK_TOKEN']
-channel = os.environ['SLACK_CHANNEL_ID']
-if token is None or channel is None:
-    print('both a slack token and a channel must be provided')
-    exit(1)
+app = Flask(__name__)
 
 
-arcgisUrl = "https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/2/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc&resultOffset=0&resultRecordCount=250&cacheHint=true"
-result = requests.get(arcgisUrl)
-countries = result.json()['features']
+@app.route("/")
+def corona():
+    token = os.environ['SLACK_TOKEN']
+    channel = os.environ['SLACK_CHANNEL_ID']
+    if token is None or channel is None:
+        print('both a slack token and a channel must be provided')
+        exit(1)
 
-# push to slack
-client = slack.WebClient(token=token)
-client.chat_postMessage(channel=channel, text=pretty_printed_string(countries))
+
+    arcgisUrl = "https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/2/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc&resultOffset=0&resultRecordCount=250&cacheHint=true"
+    result = requests.get(arcgisUrl)
+    countries = result.json()['features']
+
+    # push to slack
+    client = slack.WebClient(token=token)
+    client.chat_postMessage(channel=channel, text=pretty_printed_string(countries))
+
+    return "OK"
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
 

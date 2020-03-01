@@ -6,4 +6,6 @@ RUN cd /opt && pipenv lock --requirements > requirements.txt && pip install -r /
 
 ADD src/ /opt/coronabot
 
+ENV FLASK_APP=/opt/coronabot/coronabot.py
+EXPOSE 5000
 CMD ["python", "/opt/coronabot/coronabot.py"]
