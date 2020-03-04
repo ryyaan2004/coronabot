@@ -44,6 +44,10 @@ def pretty_printed_string(json_list):
     return r
 
 
+def chunk(lst, size):
+    return (lst[pos:pos + size] for pos in range(0, len(lst), size))
+
+
 app = Flask(__name__)
 
 
@@ -62,7 +66,8 @@ def corona():
 
     # push to slack
     client = slack.WebClient(token=token)
-    client.chat_postMessage(channel=channel, text=pretty_printed_string(countries))
+    for group in chunk(countries, 50):
+        client.chat_postMessage(channel=channel, text=pretty_printed_string(group))
 
     return "OK"
 
