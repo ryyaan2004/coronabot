@@ -48,6 +48,12 @@ def chunk(lst, size):
     return (lst[pos:pos + size] for pos in range(0, len(lst), size))
 
 
+def jhu_url():
+    """Returns the interactive web dashboard created/maintained by Johns Hopkins University"""
+    url = "https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6"
+    return "For the Johns Hopkins University interactive dashboard visit this link: {}".format(url)
+
+
 app = Flask(__name__)
 
 
@@ -59,7 +65,6 @@ def corona():
         print('both a slack token and a channel must be provided')
         exit(1)
 
-
     arcgisUrl = "https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/2/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc&resultOffset=0&resultRecordCount=250&cacheHint=true"
     result = requests.get(arcgisUrl)
     countries = result.json()['features']
@@ -69,6 +74,7 @@ def corona():
     for group in chunk(countries, 50):
         client.chat_postMessage(channel=channel, text=pretty_printed_string(group))
 
+    client.chat_postMessage(channel=channel, text=jhu_url())
     return "OK"
 
 
