@@ -31,15 +31,35 @@ class PartialFormatter(string.Formatter):
                 raise
 
 
+def ratio(str_numerator, str_denominator):
+    try:
+        return int(str_numerator) / int(str_denominator)
+    except TypeError:
+        return 'NaN'
+    except ZeroDivisionError:
+        return 'NaN'
+
+
+def percentage(num):
+    try:
+        return "{0:.0%}".format(num)
+    except ValueError:
+        return 'NaN'
+
+
 def pretty_printed_string(json_list):
     fmt = PartialFormatter()
     r = "```"
-    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|\n", "Country", "Confirmed", "Deaths", "Got Better")
-    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|\n", "", "", "", "")
+    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
+                    , "R/C")
+    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
     for item in json_list:
         thing = item['attributes']
-        r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|\n", thing['Country_Region'], thing['Confirmed'],
-                        thing['Deaths'], thing['Recovered'])
+        deaths_to_confirmed = ratio(thing['Deaths'], thing['Confirmed'])
+        recovered_to_confirmed = ratio(thing['Recovered'], thing['Confirmed'])
+        r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", thing['Country_Region'], thing['Confirmed'],
+                        thing['Deaths'], thing['Recovered'], percentage(deaths_to_confirmed),
+                        percentage(recovered_to_confirmed))
     r += "```"
     return r
 
