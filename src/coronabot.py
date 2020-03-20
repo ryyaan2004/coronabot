@@ -114,9 +114,15 @@ def corona():
     result = requests.get(arcgisUrl)
     countries = result.json()['features']
     totals = collections.Counter()
+    limit = os.environ.get('LIMIT')
+    client = slack.WebClient(token=token)
+
+    if limit is not None:
+        limit = int(limit)
+        countries = countries[:limit]
+        client.chat_postMessage(channel=channel, text='Top {} countries by confirmed cases'.format(limit))
 
     # push to slack
-    client = slack.WebClient(token=token)
     for group in chunk(countries, 50):
         client.chat_postMessage(channel=channel, text=country_table_string(group, totals))
 
@@ -125,5 +131,5 @@ def corona():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=os.environ['PORT'])
 
