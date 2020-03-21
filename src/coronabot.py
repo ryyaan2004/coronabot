@@ -4,6 +4,7 @@ import requests
 import string
 import slack
 import os
+import copy
 from flask import Flask
 
 
@@ -55,7 +56,7 @@ def accumulate(accumulator, json_entry):
     accumulator['Recovered'] += int(json_entry['Recovered'])
 
 
-def country_table_string(json_list, accumulator):
+def country_table_string(json_list):
     fmt = PartialFormatter()
     r = "```"
     r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
@@ -63,7 +64,6 @@ def country_table_string(json_list, accumulator):
     r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
     for item in json_list:
         thing = item['attributes']
-        accumulate(accumulator, thing)
         deaths_to_confirmed = ratio(thing['Deaths'], thing['Confirmed'])
         recovered_to_confirmed = ratio(thing['Recovered'], thing['Confirmed'])
         r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", thing['Country_Region'], thing['Confirmed'],
@@ -73,16 +73,20 @@ def country_table_string(json_list, accumulator):
     return r
 
 
-def summary_table_string(accumulator):
+def summary_table_string(json_list):
+    totals = collections.Counter()
+    for item in json_list:
+        thing = item['attributes']
+        accumulate(totals, thing)
     fmt = PartialFormatter()
-    deaths_to_confirmed = ratio(accumulator['Deaths'], accumulator['Confirmed'])
-    recovered_to_confirmed = ratio(accumulator['Recovered'], accumulator['Confirmed'])
+    deaths_to_confirmed = ratio(totals['Deaths'], totals['Confirmed'])
+    recovered_to_confirmed = ratio(totals['Recovered'], totals['Confirmed'])
     r = "```\n"
     r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
                     , "R/C")
     r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Worldwide", accumulator['Confirmed']
-                    , accumulator['Deaths'], accumulator['Recovered'], percentage(deaths_to_confirmed)
+    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Worldwide", totals['Confirmed']
+                    , totals['Deaths'], totals['Recovered'], percentage(deaths_to_confirmed)
                     , percentage(recovered_to_confirmed))
     r += "```\n"
     r += jhu_url()
@@ -113,7 +117,7 @@ def corona():
     arcgisUrl = "https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/2/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc&resultOffset=0&resultRecordCount=250&cacheHint=true"
     result = requests.get(arcgisUrl)
     countries = result.json()['features']
-    totals = collections.Counter()
+    original = copy.deepcopy(countries)
     limit = os.environ.get('LIMIT')
     client = slack.WebClient(token=token)
 
@@ -124,9 +128,9 @@ def corona():
 
     # push to slack
     for group in chunk(countries, 50):
-        client.chat_postMessage(channel=channel, text=country_table_string(group, totals))
+        client.chat_postMessage(channel=channel, text=country_table_string(group))
 
-    client.chat_postMessage(channel=channel, text=summary_table_string(totals))
+    client.chat_postMessage(channel=channel, text=summary_table_string(original))
     return "OK"
 
 
