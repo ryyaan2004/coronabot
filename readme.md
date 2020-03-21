@@ -26,9 +26,11 @@ Slack channel id can be found as the last argument on the channel url. Example c
 
 ### Optional
 *PORT*
+
 The port to listen on. Will default to 5000
 
 *LIMIT*
+
 Limits the number of entries in the result table.
 
 ## License
