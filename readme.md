@@ -15,13 +15,21 @@ $ docker run -e SLACK_TOKEN=xoxp-1111111-22222-3333-444 -e SLACK_CHANNEL_ID=C5P1
 
 ## Environment Variables
 
+### Required
 *SLACK_TOKEN*
 
-Slack token with permissions to post on a channel. Hot to generate a Slack Token: https://slack.com/help/articles/215770388
+Slack token with permissions to post on a channel. How to generate a Slack Token: https://slack.com/help/articles/215770388
 
 *SLACK_CHANNEL_ID*
 
 Slack channel id can be found as the last argument on the channel url. Example channel url: https://app.slack.com/client/T0LC9999F/C5P111QZB5 Example channel id: C5P111QZB5
+
+### Optional
+*PORT*
+The port to listen on. Will default to 5000
+
+*LIMIT*
+Limits the number of entries in the result table.
 
 ## License
 
