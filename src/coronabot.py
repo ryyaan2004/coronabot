@@ -68,14 +68,14 @@ def accumulate(accumulator, json_entry):
 def country_table_string(json_list):
     fmt = PartialFormatter()
     r = "```"
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
+    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
                     , "R/C")
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
+    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
     for item in json_list:
         thing = item['attributes']
         deaths_to_confirmed = ratio(thing['Deaths'], thing['Confirmed'])
         recovered_to_confirmed = ratio(thing['Recovered'], thing['Confirmed'])
-        r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", thing['Country_Region'], thing['Confirmed'],
+        r += fmt.format("|{:>25}|{:>10,}|{:>10,}|{:>10,}|{:>5}|{:>5}|\n", thing['Country_Region'], thing['Confirmed'],
                         thing['Deaths'], thing['Recovered'], percentage(deaths_to_confirmed),
                         percentage(recovered_to_confirmed))
     r += "```"
@@ -91,10 +91,10 @@ def summary_table_string(json_list):
     deaths_to_confirmed = ratio(totals['Deaths'], totals['Confirmed'])
     recovered_to_confirmed = ratio(totals['Recovered'], totals['Confirmed'])
     r = "```\n"
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
+    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|{:>5}|{:>5}|\n", "Country", "Confirmed", "Deaths", "Recovered", "D/C"
                     , "R/C")
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
-    r += fmt.format("|{:>25}|{:>10}|{:>7}|{:>10}|{:>5}|{:>5}|\n", "Worldwide", totals['Confirmed']
+    r += fmt.format("|{:>25}|{:>10}|{:>10}|{:>10}|{:>5}|{:>5}|\n", "", "", "", "", "", "")
+    r += fmt.format("|{:>25}|{:>10,}|{:>10,}|{:>10,}|{:>5}|{:>5}|\n", "Worldwide", totals['Confirmed']
                     , totals['Deaths'], totals['Recovered'], percentage(deaths_to_confirmed)
                     , percentage(recovered_to_confirmed))
     r += "```\n"
