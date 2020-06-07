@@ -51,9 +51,18 @@ def percentage(num):
 
 
 def accumulate(accumulator, json_entry):
-    accumulator['Confirmed'] += int(json_entry['Confirmed'])
-    accumulator['Deaths'] += int(json_entry['Deaths'])
-    accumulator['Recovered'] += int(json_entry['Recovered'])
+    try:
+        accumulator['Confirmed'] += int(json_entry['Confirmed'])
+    except TypeError:
+        accumulator['Confirmed'] += 0
+    try:
+        accumulator['Deaths'] += int(json_entry['Deaths'])
+    except TypeError:
+        accumulator['Deaths'] += 0
+    try:
+        accumulator['Recovered'] += int(json_entry['Recovered'])
+    except TypeError:
+        accumulator['Recovered'] += 0
 
 
 def country_table_string(json_list):
